@@ -29,7 +29,7 @@ jobs:
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-36" "build-tools;36.0.0" "cmake;4.1.2" "ndk;29.0.14206865"
-          curl -fsSL https://services.gradle.org/distributions/gradle-9.7.1-wrapper.jar -o gradle/wrapper/gradle-wrapper.jar
+          curl -fsSL https://raw.githubusercontent.com/gradle/gradle/v9.7.1/gradle/wrapper/gradle-wrapper.jar -o gradle/wrapper/gradle-wrapper.jar
           ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Upload debug APK
