@@ -22,16 +22,14 @@ jobs:
           java-version: '25'
           cache: gradle
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android build tools
-        run: |
-          sdkmanager --install "platforms;android-37" "build-tools;37.0.0" "cmake;4.1.2" "ndk;29.0.14206865"
-          yes | sdkmanager --licenses >/dev/null || true
-
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-37" "build-tools;37.0.0" "cmake;4.1.2" "ndk;29.0.14206865"
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
