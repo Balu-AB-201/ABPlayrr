@@ -9,11 +9,12 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -194,90 +197,120 @@ inline fun NavigationRail(
         }
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
+    val barShape = RoundedCornerShape(28.dp)
+
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 10.dp, vertical = 6.dp)
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .combinedClickable(onClick = onTopIconButtonClick, onLongClick = { editing = true })
-        ) {
-            Image(
-                painter = painterResource(topIconButtonId),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(colorPalette.textSecondary),
-                modifier = Modifier.size(23.dp)
+            .padding(horizontal = 10.dp, vertical = 7.dp)
+            .shadow(12.dp, barShape, clip = false)
+            .clip(barShape)
+            .background(colorPalette.textSecondary.copy(alpha = 0.08f))
+            .border(
+                width = 0.7.dp,
+                color = colorPalette.textSecondary.copy(alpha = 0.16f),
+                shape = barShape
             )
-        }
-
-        val transition = updateTransition(targetState = tabIndex, label = "bottom_navigation")
-
-        tabs.fastForEachIndexed { index, tab ->
-            AnimatedVisibility(
-                visible = tabIndex == index || tab.key !in hiddenTabs,
-                label = "tab_visibility"
-            ) {
-                val selectedProgress by transition.animateFloat(label = "selected_progress") {
-                    if (it == index) 1f else 0f
-                }
-
-                val textColor by transition.animateColor(label = "text_color") {
-                    if (it == index) colorPalette.text else colorPalette.textDisabled
-                }
-
-                val selectedBackground by transition.animateColor(label = "selected_background") {
-                    if (it == index) colorPalette.textSecondary.copy(alpha = 0.14f)
-                    else colorPalette.textSecondary.copy(alpha = 0f)
-                }
-
-                val itemModifier = Modifier
-                    .size(width = 72.dp, height = 58.dp)
-                    .clip(24.dp.roundedShape)
-                    .background(selectedBackground, 24.dp.roundedShape)
+            .padding(horizontal = 6.dp, vertical = 5.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
                     .combinedClickable(
-                        onClick = { onTabIndexChange(index) },
+                        onClick = onTopIconButtonClick,
                         onLongClick = { editing = true }
                     )
-                    .graphicsLayer {
-                        scaleX = 0.96f + selectedProgress * 0.04f
-                        scaleY = 0.96f + selectedProgress * 0.04f
+            ) {
+                Image(
+                    painter = painterResource(topIconButtonId),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(colorPalette.textSecondary),
+                    modifier = Modifier.size(23.dp)
+                )
+            }
+
+            val transition = updateTransition(
+                targetState = tabIndex,
+                label = "bottom_navigation"
+            )
+
+            tabs.fastForEachIndexed { index, tab ->
+                AnimatedVisibility(
+                    visible = tabIndex == index || tab.key !in hiddenTabs,
+                    label = "tab_visibility"
+                ) {
+                    val selectedProgress by transition.animateFloat(label = "selected_progress") {
+                        if (it == index) 1f else 0f
                     }
 
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = itemModifier
-                ) {
-                    androidx.compose.foundation.layout.Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(tab.icon),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(colorPalette.text),
-                            modifier = Modifier
-                                .size(Dimensions.navigationRail.iconOffset * 2)
-                                .graphicsLayer {
-                                    alpha = 0.58f + selectedProgress * 0.42f
-                                    translationY = (1f - selectedProgress) * 2.dp.toPx()
-                                }
-                        )
+                    val textColor by transition.animateColor(label = "text_color") {
+                        if (it == index) colorPalette.text else colorPalette.textDisabled
+                    }
 
-                        BasicText(
-                            text = tab.title(),
-                            style = typography.xs.semiBold.center.color(textColor),
-                            modifier = Modifier.padding(top = 2.dp),
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
+                    val selectedBackground by transition.animateColor(
+                        label = "selected_background"
+                    ) {
+                        if (it == index) {
+                            colorPalette.text.copy(alpha = 0.14f)
+                        } else {
+                            colorPalette.text.copy(alpha = 0f)
+                        }
+                    }
+
+                    val itemShape = 22.dp.roundedShape
+
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(width = 72.dp, height = 58.dp)
+                            .clip(itemShape)
+                            .background(selectedBackground, itemShape)
+                            .combinedClickable(
+                                onClick = { onTabIndexChange(index) },
+                                onLongClick = { editing = true }
+                            )
+                            .graphicsLayer {
+                                scaleX = 0.95f + selectedProgress * 0.05f
+                                scaleY = 0.95f + selectedProgress * 0.05f
+                            }
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                painter = painterResource(tab.icon),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(
+                                    if (tabIndex == index) colorPalette.text
+                                    else colorPalette.textSecondary
+                                ),
+                                modifier = Modifier
+                                    .size(Dimensions.navigationRail.iconOffset * 2)
+                                    .graphicsLayer {
+                                        alpha = 0.55f + selectedProgress * 0.45f
+                                        translationY = (1f - selectedProgress) * 2.dp.toPx()
+                                    }
+                            )
+
+                            BasicText(
+                                text = tab.title(),
+                                style = typography.xs.semiBold.center.color(textColor),
+                                modifier = Modifier.padding(top = 2.dp),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
+                            )
+                        }
                     }
                 }
             }
