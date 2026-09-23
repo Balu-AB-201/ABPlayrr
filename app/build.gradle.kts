@@ -13,7 +13,7 @@ android {
     val appId = "${project.group}.android"
 
     namespace = appId
-    compileSdk = 37
+    compileSdk = 36
 
     val abis = listOf("arm64-v8a", "x86_64")
     val cmakeVersion = "4.1.2"
@@ -23,7 +23,7 @@ android {
         applicationId = appId
 
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 36
 
         versionCode = System.getenv("ANDROID_VERSION_CODE")?.toIntOrNull() ?: 25
         versionName = project.version.toString()
