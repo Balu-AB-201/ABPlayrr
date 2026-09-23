@@ -15,6 +15,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -74,46 +75,26 @@ class TabsBuilder @PublishedApi internal constructor() {
     @PublishedApi
     internal val tabs = mutableMapOf<String, Tab>()
 
-    fun tab(
-        key: Int,
-        @StringRes title: Int,
-        @DrawableRes icon: Int,
-        canHide: Boolean = true
-    ): Tab = tab(key.toString(), title, icon, canHide)
+    fun tab(key: Int, @StringRes title: Int, @DrawableRes icon: Int, canHide: Boolean = true): Tab =
+        tab(key.toString(), title, icon, canHide)
 
-    fun tab(
-        key: String,
-        @StringRes title: Int,
-        @DrawableRes icon: Int,
-        canHide: Boolean = true
-    ): Tab {
+    fun tab(key: String, @StringRes title: Int, @DrawableRes icon: Int, canHide: Boolean = true): Tab {
         require(key.isNotBlank()) { "key cannot be blank" }
         require(!tabs.containsKey(key)) { "key already exists" }
         require(icon != 0) { "icon is 0" }
-
         val ret = Tab.ResourcesTab(key, title, icon, canHide)
         tabs += key to ret
         return ret
     }
 
-    fun tab(
-        key: Int,
-        title: String,
-        @DrawableRes icon: Int,
-        canHide: Boolean = true
-    ): Tab = tab(key.toString(), title, icon, canHide)
+    fun tab(key: Int, title: String, @DrawableRes icon: Int, canHide: Boolean = true): Tab =
+        tab(key.toString(), title, icon, canHide)
 
-    fun tab(
-        key: String,
-        title: String,
-        @DrawableRes icon: Int,
-        canHide: Boolean = true
-    ): Tab {
+    fun tab(key: String, title: String, @DrawableRes icon: Int, canHide: Boolean = true): Tab {
         require(key.isNotBlank()) { "key cannot be blank" }
         require(title.isNotBlank()) { "title cannot be blank" }
         require(!tabs.containsKey(key)) { "key already exists" }
         require(icon != 0) { "icon is 0" }
-
         val ret = Tab.StaticTab(key, title, icon, canHide)
         tabs += key to ret
         return ret
@@ -207,11 +188,7 @@ inline fun NavigationRail(
             .shadow(12.dp, barShape, clip = false)
             .clip(barShape)
             .background(colorPalette.textSecondary.copy(alpha = 0.08f))
-            .border(
-                width = 0.7.dp,
-                color = colorPalette.textSecondary.copy(alpha = 0.16f),
-                shape = barShape
-            )
+            .border(0.7.dp, colorPalette.textSecondary.copy(alpha = 0.16f), barShape)
             .padding(horizontal = 6.dp, vertical = 5.dp)
     ) {
         Row(
@@ -239,10 +216,7 @@ inline fun NavigationRail(
                 )
             }
 
-            val transition = updateTransition(
-                targetState = tabIndex,
-                label = "bottom_navigation"
-            )
+            val transition = updateTransition(tabIndex, label = "bottom_navigation")
 
             tabs.fastForEachIndexed { index, tab ->
                 AnimatedVisibility(
@@ -257,14 +231,9 @@ inline fun NavigationRail(
                         if (it == index) colorPalette.text else colorPalette.textDisabled
                     }
 
-                    val selectedBackground by transition.animateColor(
-                        label = "selected_background"
-                    ) {
-                        if (it == index) {
-                            colorPalette.text.copy(alpha = 0.14f)
-                        } else {
-                            colorPalette.text.copy(alpha = 0f)
-                        }
+                    val selectedBackground by transition.animateColor(label = "selected_background") {
+                        if (it == index) colorPalette.text.copy(alpha = 0.14f)
+                        else colorPalette.text.copy(alpha = 0f)
                     }
 
                     val itemShape = 22.dp.roundedShape
