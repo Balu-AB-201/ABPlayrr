@@ -1,16 +1,18 @@
 package app.vitune.android.ui.components.themed
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Down
-import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Up
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Left
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Right
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.weight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -37,26 +39,15 @@ fun Scaffold(
     val (colorPalette) = LocalAppearance.current
     var hiddenTabs by UIStatePreferences.mutableTabStateOf(key)
 
-    Row(
+    Column(
         modifier = modifier
             .background(colorPalette.background0)
             .fillMaxSize()
     ) {
-        NavigationRail(
-            topIconButtonId = topIconButtonId,
-            onTopIconButtonClick = onTopIconButtonClick,
-            tabIndex = tabIndex,
-            onTabIndexChange = onTabChange,
-            hiddenTabs = hiddenTabs,
-            setHiddenTabs = { hiddenTabs = it.toImmutableList() },
-            tabsEditingTitle = tabsEditingTitle,
-            content = tabColumnContent
-        )
-
         AnimatedContent(
             targetState = tabIndex,
             transitionSpec = {
-                val slideDirection = if (targetState > initialState) Up else Down
+                val slideDirection = if (targetState > initialState) Left else Right
                 val animationSpec = spring(
                     dampingRatio = 0.9f,
                     stiffness = Spring.StiffnessLow,
@@ -69,8 +60,22 @@ fun Scaffold(
                     sizeTransform = null
                 )
             },
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
             content = content,
-            label = ""
+            label = "tab_content"
+        )
+
+        NavigationRail(
+            topIconButtonId = topIconButtonId,
+            onTopIconButtonClick = onTopIconButtonClick,
+            tabIndex = tabIndex,
+            onTabIndexChange = onTabChange,
+            hiddenTabs = hiddenTabs,
+            setHiddenTabs = { hiddenTabs = it.toImmutableList() },
+            tabsEditingTitle = tabsEditingTitle,
+            content = tabColumnContent
         )
     }
 }
