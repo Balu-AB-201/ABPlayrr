@@ -8,6 +8,7 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -195,17 +196,17 @@ inline fun NavigationRail(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
             .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp, vertical = 6.dp)
+            .padding(horizontal = 10.dp, vertical = 6.dp)
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(52.dp)
+                .size(48.dp)
                 .clip(CircleShape)
                 .combinedClickable(onClick = onTopIconButtonClick, onLongClick = { editing = true })
         ) {
@@ -213,7 +214,7 @@ inline fun NavigationRail(
                 painter = painterResource(topIconButtonId),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(colorPalette.textSecondary),
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(23.dp)
             )
         }
 
@@ -232,16 +233,22 @@ inline fun NavigationRail(
                     if (it == index) colorPalette.text else colorPalette.textDisabled
                 }
 
+                val selectedBackground by transition.animateColor(label = "selected_background") {
+                    if (it == index) colorPalette.textSecondary.copy(alpha = 0.14f)
+                    else colorPalette.textSecondary.copy(alpha = 0f)
+                }
+
                 val itemModifier = Modifier
                     .size(width = 72.dp, height = 58.dp)
                     .clip(24.dp.roundedShape)
+                    .background(selectedBackground, 24.dp.roundedShape)
                     .combinedClickable(
                         onClick = { onTabIndexChange(index) },
                         onLongClick = { editing = true }
                     )
                     .graphicsLayer {
-                        scaleX = 0.94f + selectedProgress * 0.06f
-                        scaleY = 0.94f + selectedProgress * 0.06f
+                        scaleX = 0.96f + selectedProgress * 0.04f
+                        scaleY = 0.96f + selectedProgress * 0.04f
                     }
 
                 Box(
@@ -259,8 +266,8 @@ inline fun NavigationRail(
                             modifier = Modifier
                                 .size(Dimensions.navigationRail.iconOffset * 2)
                                 .graphicsLayer {
-                                    alpha = 0.62f + selectedProgress * 0.38f
-                                    translationY = (1f - selectedProgress) * 3.dp.toPx()
+                                    alpha = 0.58f + selectedProgress * 0.42f
+                                    translationY = (1f - selectedProgress) * 2.dp.toPx()
                                 }
                         )
 
